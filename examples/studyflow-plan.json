@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "tasks": [
+    { "taskKey": "reading-001", "project": "阅读计划", "title": "阅读第一章并整理笔记", "estimateMinutes": 45 },
+    { "taskKey": "review-001", "project": "阅读计划", "title": "复习第一章重点", "estimateMinutes": 20 }
+  ],
+  "plans": [
+    { "date": "2026-09-11", "taskKey": "reading-001", "minutes": 45 },
+    { "date": "2026-09-12", "taskKey": "review-001", "minutes": 20 }
+  ]
+}

@@ -1,0 +1,77 @@
+import { build } from 'esbuild';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+await mkdir('dist', { recursive: true });
+await mkdir('.cache/reminder-smoke', { recursive: true });
+const root = await mkdtemp(resolve('.cache/reminder-smoke/run-'));
+const fixture = join(root, 'fixture.cjs');
+await build({ stdin: { contents: "export { DesktopFocus } from './src/desktop/focus'; export { DesktopReminder } from './src/desktop/reminder';", resolveDir: process.cwd() },
+  outfile: fixture, bundle: true, platform: 'node', format: 'cjs', external: ['electron'] });
+const entry = join(root, 'driver.cjs');
+await writeFile(entry, `
+const { app, BrowserWindow, screen } = require('electron');
+const { writeFileSync } = require('node:fs');
+const assert = require('node:assert/strict');
+const { DesktopFocus, DesktopReminder } = require(${JSON.stringify(fixture)});
+app.setPath('userData', ${JSON.stringify(join(root, 'data'))});
+app.on('window-all-closed', () => {});
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const watchdog = setTimeout(() => app.exit(1), 25000);
+app.whenReady().then(async () => {
+  const reminder = new DesktopReminder();
+  let current = ' CODE.EXE ', now = 1000, shown = 0;
+  app.on('browser-window-created', () => { shown++; });
+  const focus = new DesktopFocus({ sample: async () => current, now: () => now,
+    credit: () => {}, notify: body => reminder.show(body), dismiss: () => reminder.dismiss() });
+  focus.start(null, 25, ['code.exe']);
+  await focus.tick(); assert.equal(shown, 0, 'Whitelist must not create a reminder');
+  current = 'Game<&>.exe'; await focus.tick();
+  assert.equal(focus.state().notification, 'sent');
+  const win = BrowserWindow.getAllWindows()[0]; assert(win);
+  assert(win.isVisible(), 'Reminder must be visible');
+  assert(win.isAlwaysOnTop(), 'Reminder must be on top');
+  assert(!win.isFocused(), 'Reminder must not steal focus');
+  const bounds = win.getBounds(), area = screen.getDisplayMatching(bounds).workArea;
+  assert(Math.abs(bounds.x + bounds.width / 2 - area.x - area.width / 2) <= 1, 'Horizontal center');
+  assert(Math.abs(bounds.y + bounds.height / 2 - area.y - area.height / 2) <= 1, 'Vertical center');
+  assert((await win.webContents.executeJavaScript('document.body.textContent')).includes('Game<&>.exe'), 'App name is literal text');
+  assert.equal(await win.webContents.executeJavaScript('typeof require'), 'undefined');
+  await delay(250);
+  writeFileSync(${JSON.stringify(resolve('dist/reminder-preview.png'))}, (await win.webContents.capturePage()).toPNG());
+  current = 'Code.exe'; await focus.tick(); assert(win.isDestroyed(), 'Allowed app dismisses reminder');
+  current = 'Other.exe'; now += 30000; await focus.tick(); assert.equal(shown, 1, 'Global cooldown survives app changes');
+  now += 30000; await focus.tick(); assert.equal(shown, 2);
+  const timed = BrowserWindow.getAllWindows()[0];
+  const seconds = () => timed.webContents.executeJavaScript('document.querySelector("#reminder-seconds")?.textContent');
+  assert.equal(await seconds(), '8', 'Visible countdown starts at 8');
+  await delay(1150); assert.equal(await seconds(), '7', 'Visible countdown decreases to 7');
+  await delay(1000); assert.equal(await seconds(), '6', 'Visible countdown decreases to 6');
+  await delay(6050); assert(timed.isDestroyed(), 'Reminder auto-closes');
+  await reminder.show('Single click dismissal');
+  const clicked = BrowserWindow.getAllWindows()[0];
+  const point = await clicked.webContents.executeJavaScript('(() => { const b = document.querySelector("#reminder-close"); if (!b) return null; const r = b.getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; })()');
+  assert(point, 'An explicit close button exists');
+  clicked.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
+  clicked.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
+  await delay(150); assert(clicked.isDestroyed(), 'One click closes the reminder');
+  now += 60000; await focus.tick(); const stopped = BrowserWindow.getAllWindows()[0];
+  focus.stop(); assert(stopped.isDestroyed(), 'Stopping dismisses reminder');
+  const pending = reminder.show('Cancelled before page load'); reminder.dismiss(); await pending;
+  await delay(150); assert.equal(BrowserWindow.getAllWindows().length, 0, 'No late window after cancellation');
+  console.log('PASS: whitelist, centered visible topmost window, no focus stealing, literal text, cooldown, auto-close, stop and loading cancellation');
+  clearTimeout(watchdog); app.quit();
+}).catch(error => { console.error(error); clearTimeout(watchdog); app.exit(1); });
+`);
+const env = { ...process.env }; delete env.ELECTRON_RUN_AS_NODE;
+await new Promise((done, reject) => {
+  let passed = false;
+  const child = spawn(require('electron'), [entry], { env, windowsHide: true, stdio: ['ignore', 'pipe', 'inherit'] });
+  child.stdout.on('data', chunk => { process.stdout.write(chunk); if (chunk.toString().includes('PASS: whitelist')) passed = true; });
+  const timeout = setTimeout(() => { child.kill(); reject(new Error('Reminder verification timed out')); }, 30000);
+  child.on('error', error => { clearTimeout(timeout); reject(error); });
+  child.on('exit', code => { clearTimeout(timeout); code === 0 && passed ? done() : reject(new Error('Reminder verification incomplete or failed: ' + code)); });
+});

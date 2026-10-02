@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>StudyFlow Phase 0</title>
+  <style>
+    body { font: 16px system-ui,sans-serif; max-width: 760px; margin: 24px auto; padding: 0 20px; color: var(--text-color,#222); background: var(--bg-color,#fafafa); }
+    section { border: 1px solid #888; border-radius: 8px; margin: 18px 0; padding: 16px; }
+    button { padding: 8px 12px; margin: 4px; cursor: pointer; }
+    button:disabled { cursor: default; opacity: .55; }
+    label { display: block; margin: 12px 0; }
+    input, textarea { display: block; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 8px; }
+    pre, p { white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>StudyFlow Phase 0</h1>
+  <p>Windows 实机验证待完成。专注测试期间保持本视图打开；离开视图会结束测试。</p>
+  <section>
+    <h2>Super Productivity</h2>
+    <pre id="capabilities"></pre>
+    <button id="check-api">Check API</button>
+    <button id="create-probe">Create Probe Task</button>
+    <p id="tasks" role="status">尚未读取任务</p>
+  </section>
+  <section>
+    <h2>ActivityWatch</h2>
+    <label>Hostname（可选；多机器时填当前 Windows 主机名）<input id="hostname" autocomplete="off"></label>
+    <button id="check-aw">Check ActivityWatch</button>
+    <p id="aw-status" role="status">Not checked</p>
+    <p>Current app: <span id="current-app">—</span></p>
+  </section>
+  <section>
+    <h2>Focus Test</h2>
+    <label>白名单（每行一个实测 app 名称，不使用窗口标题）<textarea id="whitelist" rows="4" placeholder="请根据 ActivityWatch 实测填写"></textarea></label>
+    <button id="start-focus">Start 10-min Focus Test</button>
+    <button id="stop-focus" disabled>Stop</button>
+    <p id="focus-status" role="status">Stopped</p>
+    <pre id="focus-diagnostic">诊断：尚未开始</pre>
+    <p>通知状态 returned 仅表示宿主 API 已返回，不代表 Windows 已显示。诊断仅保留在当前视图。</p>
+  </section>
+  <p id="last-error" role="alert"></p>
+  <script>/* STUDYFLOW_SCRIPT */</script>
+</body>
+</html>

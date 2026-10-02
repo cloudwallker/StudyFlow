@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>StudyFlow 专注小窗</title>
+  <link rel="stylesheet" href="focus-mini.css">
+</head>
+<body data-status="idle">
+  <main>
+    <header><span class="brand">STUDYFLOW · FOCUS</span><span id="focus-mini-status">正在读取</span></header>
+    <time id="focus-mini-time" datetime="PT0S">00:00:00</time>
+    <p id="focus-mini-date">今日累计</p>
+    <p id="focus-mini-task">自由专注</p>
+    <p id="focus-mini-error" role="status" aria-live="polite"></p>
+    <footer>
+      <button id="focus-mini-open-main" type="button">返回主界面</button>
+      <button id="focus-mini-close" type="button" aria-label="关闭专注小窗">关闭</button>
+    </footer>
+  </main>
+  <script src="focus-mini-renderer.js"></script>
+</body>
+</html>

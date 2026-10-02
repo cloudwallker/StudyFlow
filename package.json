@@ -1,0 +1,51 @@
+{
+  "name": "studyflow-phase0",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "vitest run --exclude release/**",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+    "build": "npm run typecheck && node scripts/build-plugin.mjs",
+    "verify:plugin": "node scripts/verify-plugin.mjs",
+    "test:import": "vitest run tests/desktop-import.test.ts tests/desktop-import-renderer.test.ts tests/desktop-import-paste.test.ts",
+    "verify:import": "node scripts/verify-json-import.mjs",
+    "install:electron": "node scripts/install-electron.mjs",
+    "test:desktop": "vitest run tests/desktop-continuous.test.ts tests/desktop-daily.test.ts tests/desktop-lifecycle.test.ts tests/desktop-history.test.ts tests/desktop-activity.test.ts tests/desktop-focus.test.ts tests/desktop-service.test.ts tests/desktop-store.test.ts tests/desktop-renderer.test.ts tests/desktop-study.test.ts tests/activity-recorder.test.ts tests/timer-service.test.ts tests/pomodoro-policy.test.ts --exclude release/**",
+    "build:desktop": "npm run typecheck && node scripts/build-desktop.mjs",
+    "start:desktop": "npm run build:desktop && node scripts/start-desktop.mjs",
+    "verify:desktop": "node scripts/verify-m3.mjs",
+    "verify:m3": "node scripts/verify-m3.mjs",
+    "verify:reminder": "node scripts/verify-reminder.mjs",
+    "verify:plan": "node scripts/verify-plan-optimization.mjs",
+    "verify:focus-mini": "node scripts/verify-focus-mini.mjs",
+    "verify:frontend": "node scripts/verify-frontend.mjs",
+    "verify:pomodoro": "node scripts/verify-pomodoro.mjs",
+    "verify:long-focus": "node scripts/verify-long-focus.mjs",
+    "verify:calendar": "node scripts/verify-calendar.mjs",
+    "verify:management": "node scripts/verify-management.mjs",
+    "verify:ambient": "node scripts/verify-ambient.mjs",
+    "verify:delivery": "node scripts/local-delivery.mjs verify",
+    "verify:package": "node scripts/verify-package.mjs",
+    "package:desktop": "npm run build:desktop && node scripts/package-desktop.mjs",
+    "build:test-app": "npm run typecheck && node scripts/build-desktop.mjs --test-build",
+    "package:test-app": "npm run build:test-app && node scripts/package-desktop.mjs --test-build && node scripts/assemble-test-kit.mjs",
+    "verify:watchdog": "node scripts/verify-watchdog.mjs",
+    "verify:diagnostics": "node scripts/verify-diagnostics.mjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@super-productivity/plugin-api": "1.0.1",
+    "@types/node": "24.10.1",
+    "electron": "44.3.0",
+    "esbuild": "0.25.12",
+    "fflate": "0.8.3",
+    "jsdom": "26.1.0",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

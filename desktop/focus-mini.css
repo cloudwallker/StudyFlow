@@ -1,0 +1,19 @@
+:root{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",sans-serif;color:#24392f;background:#f5f6f3;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(145deg,#f8faf6,#edf3eb);user-select:none;-webkit-app-region:drag}
+main{padding:19px 21px 16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{color:#758579;font-size:10px;letter-spacing:.11em}
+#focus-mini-status{border-radius:999px;background:#dfe9df;color:#315d48;padding:5px 9px;font-size:11px;white-space:nowrap}
+#focus-mini-time{display:block;margin-top:24px;color:#315d48;font:600 37px/1 "Cascadia Mono",Consolas,monospace;letter-spacing:.025em;font-variant-numeric:tabular-nums}
+#focus-mini-date{margin:8px 0 0;color:#7b897f;font-size:11px}
+#focus-mini-task{margin:14px 0 0;overflow:hidden;color:#334a3d;font-size:14px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+#focus-mini-error{height:15px;margin:5px 0 0;color:#a04b42;font-size:10px}
+footer{display:flex;gap:8px;margin-top:8px;-webkit-app-region:no-drag}
+button{border:0;border-radius:7px;padding:7px 10px;background:#e0e9de;color:#3e654d;font:inherit;font-size:11px;cursor:pointer}
+button:first-child{background:#326d4d;color:#fff}
+button:disabled{cursor:wait;opacity:.55}
+button:focus-visible{outline:2px solid #326d4d;outline-offset:2px}
+body[data-status="paused"] #focus-mini-status,body[data-status="waiting"] #focus-mini-status{background:#eee5d5;color:#765a2d}
+body[data-status="break"] #focus-mini-status{background:#dfe8ef;color:#43677d}
+body[data-status="idle"] #focus-mini-status,body[data-status="stopped"] #focus-mini-status{background:#e4e6e4;color:#65756c}

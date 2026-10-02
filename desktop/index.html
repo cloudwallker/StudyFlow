@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>StudyFlow</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="workspace.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">S</span><div>StudyFlow<small>计划 · 专注 · 回顾</small></div></div>
+    <div class="section-label">我的空间</div>
+    <nav class="main-nav" aria-label="主导航">
+      <button id="all-projects" class="nav-item selected" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>学习工作台 <span id="nav-count">0</span></button>
+      <button id="nav-review" class="nav-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M8 15v-4m5 4V7m5 8v-6"/></svg>活动与复盘</button>
+      <button id="nav-settings" class="nav-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16M9 4v6m6 4v6"/></svg>设置</button>
+    </nav>
+    <div class="section-label projects-label">项目</div>
+    <nav id="projects" aria-label="项目"></nav>
+    <form id="project-form" class="project-form"><label class="sr-only" for="project-name">新项目名称</label><input id="project-name" maxlength="80" placeholder="新项目名称" required><button title="创建项目" aria-label="创建项目">＋</button></form>
+    <div class="sidebar-footer"><span class="status-dot"></span> 本地保存 · 离线可用<small>关闭窗口后，专注继续在托盘运行</small></div>
+  </aside>
+  <main>
+    <header><div><div class="eyebrow" id="today">把今天过得更专注</div><h1 id="view-title">学习工作台</h1><p class="muted" id="view-description">安排今天，从一件重要的事开始。</p></div><div class="header-actions"><button id="quick-import" class="secondary" type="button">导入计划</button><button id="quick-add" class="primary" type="button">＋ 添加任务</button></div></header>
+    <button id="active-session" class="active-session" type="button" hidden aria-label="返回正在进行的专注"></button>
+    <div id="error" role="alert" hidden></div>
+    <div id="workspace-page">
+    <section class="overview" aria-label="任务概况"><div><small>全部待办</small><span id="pending-count">0</span></div><div><small>整体已完成</small><span id="done-count">0</span></div><div><small>累计任务专注</small><span id="focus-minutes">0 分钟</span></div></section>
+    <div class="workspace">
+      <section class="tasks-panel">
+        <div class="panel-title"><div><span class="section-kicker">从一件重要的事开始</span><h2>我的学习安排</h2></div><button id="focus-view" class="secondary" aria-pressed="false" type="button">进入专注模式</button></div>
+        <div class="agenda-tabs"><button id="task-view-day" aria-pressed="true" type="button">按日学习</button><button id="task-view-all" aria-pressed="false" type="button">全部任务</button><span id="task-count" class="muted">0 个任务</span></div>
+        <div id="calendar-controls">
+          <div class="calendar-toolbar"><button id="calendar-prev" type="button" aria-label="上个月">‹</button><strong id="calendar-month"></strong><button id="calendar-next" type="button" aria-label="下个月">›</button><button id="calendar-today" type="button">今天</button><button id="calendar-first" type="button">计划首日</button></div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+          <div id="calendar-grid" class="calendar-grid" aria-label="选择学习日期"></div>
+          <div class="calendar-jump"><label>跳转日期 <input id="calendar-date" type="date"></label><button id="calendar-expand" type="button" class="secondary" aria-expanded="false">展开月历</button></div>
+        </div>
+        <p id="agenda-summary" class="agenda-summary" aria-live="polite"></p>
+        <div id="tasks" class="task-list"></div>
+        <div id="empty" class="empty"><div class="empty-symbol">✓</div><h3>给今天一个小目标</h3><p>添加或导入学习计划，然后开启一段专注。</p></div>
+        <details id="task-entry" class="task-entry"><summary>添加任务 / 导入计划 <span class="disclosure-hint">展开录入</span></summary>
+        <form id="task-form">
+          <label class="sr-only" for="task-title">任务名称</label><input id="task-title" maxlength="200" placeholder="写下你想完成的一件事…" required>
+          <div class="task-options"><select id="task-project" aria-label="所属项目"><option value="">未分配项目</option></select><label>预计 <input id="task-estimate" type="number" min="1" max="240" value="25" required> 分钟</label><button class="primary" type="submit">＋ 添加任务</button></div>
+        </form>
+        <details id="import-panel" class="import-panel">
+          <summary>导入已有学习计划</summary>
+          <p class="hint">先检查，再保存。已有计划默认合并保留。</p>
+          <h3 class="import-step"><span>01</span> 选择内容</h3>
+          <div class="import-sources"><section class="import-source">
+          <h4>从文件导入</h4>
+          <label class="field-label" for="import-file">选择 JSON 或 XLSX 文件（最多 1 MiB）</label>
+          <input id="import-file" type="file" accept=".json,.xlsx,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <p class="template-links"><a href="studyflow-plan.json" download="studyflow-plan.json">JSON 模板 ↓</a><a href="studyflow-plan.xlsx" download="studyflow-plan.xlsx">Excel 模板 ↓</a></p>
+          </section><section class="import-paste import-source"><h4>直接粘贴 JSON</h4>
+            <label class="field-label" for="import-json">粘贴符合模板的 JSON（也支持完整 JSON 代码块）</label>
+            <textarea id="import-json" rows="7" spellcheck="false" placeholder='{"schemaVersion":1,"tasks":[…],"plans":[…]}'></textarea>
+            <button id="import-paste-preview" type="button" class="secondary">预览粘贴内容</button>
+          </section></div>
+          <label class="field-label" for="import-start-date">文件缺少日期时：第 1 天日期（可选）</label><input id="import-start-date" type="date">
+          <details class="format-guide"><summary>文件格式与日期规则</summary>
+          <p class="hint">优先读取 plans.date。可识别标题开头的「第1天」「第一天」「Day 1」「1｜」，缺少实际日期时请选择开始日期后重新预览。不会用导入顺序倒排学习日程。</p>
+          <details class="json-guidance"><summary>给外部 AI 的合规 JSON 要求</summary><p>请生成可下载的 UTF-8 JSON，顶层仅包含 schemaVersion: 1、tasks 和 plans。每项 tasks 包含唯一 taskKey、project、title、estimateMinutes（1—240 整数）；每项 plans 包含 date（YYYY-MM-DD 本地日期）、taskKey、minutes（1—1440 整数），引用对应任务。每天独立任务可使用不同 taskKey；重复练习也可将同一 taskKey 安排多天，各日独立打卡。在 plans 明确填写日期。不要只把「第1天」写在标题中，不要省略 plans，不要写完成状态或实际用时。请按开始日期逐日生成，单日总分钟不超过我的可用时间。文件须与示例模板一致，不加其他字段。</p></details>
+          <p class="hint">Excel 请保留 meta、tasks、plans 三个工作表和表头。日期填文本 YYYY-MM-DD，分钟填整数，不使用公式或合并单元格。</p>
+          </details>
+          <p id="import-status" role="status" aria-live="polite"></p>
+          <div id="import-preview" hidden>
+            <h3 class="import-step"><span>02</span> 检查预览与差异</h3>
+            <p id="import-summary" class="import-summary"></p>
+            <p id="import-errors" role="alert"></p>
+            <h3>项目</h3><div id="import-projects"></div>
+            <h3>文件中的任务</h3><ul id="import-tasks"></ul>
+            <h3>每日计划</h3><div id="import-days"></div>
+          </div>
+          <div class="import-confirmation"><h3 class="import-step"><span>03</span> 确认保存</h3><div class="import-actions"><button id="import-repreview" type="button">重新预览</button><button id="import-cancel" type="button">取消</button><button id="import-confirm" class="primary" type="button" disabled>确认导入</button></div></div>
+        </details>
+        </details>
+      </section>
+      <section class="focus-panel" aria-label="专注计时">
+        <div class="panel-title"><div><span class="section-kicker">一次只做一件事</span><h2>本次专注</h2></div><span id="focus-badge" class="badge">准备开始</span></div>
+        <div class="focus-pickers"><div><label class="field-label" for="focus-mode">计时模式</label><select id="focus-mode"><option value="countdown">定时专注</option><option value="stopwatch">正计时</option><option value="pomodoro">番茄钟</option></select></div><div><label class="field-label" for="focus-task">本次专注任务</label><select id="focus-task"><option value="">自由专注</option></select></div></div>
+        <div class="timer-circle"><span id="timer">25:00</span><small id="timer-label">一次只做一件事</small></div>
+        <p id="micro-countdown" class="focus-message" role="status" hidden></p>
+        <button id="focus-toggle" class="primary focus-button">开始专注</button>
+        <button id="focus-mini-open" class="secondary focus-button" type="button" title="置顶显示今天累计专注时间">打开专注小窗 ↗</button>
+        <label id="pomo-next-field" hidden>下一阶段 <input id="pomo-next" type="number" min="1" max="240" value="5"> 分钟</label>
+        <button id="focus-pause" class="secondary focus-button" hidden>暂停计时</button>
+        <details class="session-options"><summary>本次计时设置</summary>
+          <div id="pomo-settings" hidden>
+            <label class="activity-opt-in"><input id="long-enabled" type="checkbox"> 长专注＋微休息模式</label>
+            <div id="long-options" hidden>
+              <label>本轮总时长 <input id="long-total" type="number" min="1" max="240" value="60"> 分钟</label>
+              <label>轮后长休息 <input id="long-rest" type="number" min="1" max="240" value="10"> 分钟</label>
+              <label class="activity-opt-in"><input id="micro-enabled" type="checkbox"> 启用微休息（自动开始、自动结束）</label>
+              <div id="micro-options" hidden>
+                <label>最小工作间隔 <input id="micro-min" type="number" min="1" max="240" value="2"> 分钟</label>
+                <label>最大工作间隔 <input id="micro-max" type="number" min="1" max="240" value="3"> 分钟</label>
+                <label>微休息时长 <input id="micro-duration" type="number" min="1" max="600" value="10"> 秒</label>
+                <p class="hint">每次在范围内随机，两值相同为固定间隔。开启后替代原随机提示音。</p>
+              </div>
+              <p class="hint">本轮包含微休息；暂停冻结两层倒计时。微休息不计入有效学习。轮后自动长休息，结束后手动开始下一轮。</p>
+            </div>
+            <div id="classic-pomo-options">
+            <label>工作 <input id="pomo-work" type="number" min="1" max="240" value="25"> 分钟</label>
+            <label>短休息 <input id="pomo-short" type="number" min="1" max="240" value="5"> 分钟</label>
+            <label>长休息 <input id="pomo-long" type="number" min="1" max="240" value="15"> 分钟</label>
+            <label>每 <input id="pomo-rounds" type="number" min="1" max="100" value="4"> 轮长休息</label>
+            </div>
+          </div>
+          <label>空闲阈值 <input id="idle-minutes" type="number" min="1" max="240" value="5"> 分钟</label>
+          <p class="hint">这些设置用于本次计时。空闲达到阈值后，会从最后操作时刻修正学习时间。</p>
+        </details>
+        <p id="learning-summary" class="focus-message"></p>
+        <p id="focus-message" class="focus-message" role="status">准备好后，开始一段专注</p>
+        <div class="current-app"><span>当前应用</span><strong id="current-app">未开始采集</strong></div>
+
+      </section>
+    </div>
+    </div>
+    <section id="daily-panel" hidden class="daily-panel" aria-label="每日学习与复盘">
+      <div class="review-toolbar"><div><span class="section-kicker">回看一天的投入</span><h2>每日学习与复盘</h2></div><div class="review-date"><label>日期 <input id="daily-date" type="date"></label><button id="daily-load" class="secondary">读取日期 / 刷新</button></div></div>
+      <p id="daily-loaded-date"></p><p id="daily-status" role="status"></p>
+      <p class="hint">选择日期后点击读取；保存作用于已读取的日期。</p>
+      <p id="daily-summary" class="daily-summary"></p>
+      <div class="review-layout"><div class="review-data">
+        <section class="review-card"><h3>时间的去向</h3>
+          <details open><summary>每日时间线</summary><h4>学习会话</h4><div id="daily-timeline" class="table-scroll"></div><h4>应用活动（独立轨道）</h4><div id="daily-activities" class="table-scroll"></div></details>
+          <details><summary>应用时长与分类</summary><div id="daily-apps" class="table-scroll"></div>
+            <form id="app-category-form"><label>应用名 <input id="category-app" maxlength="260" required placeholder="Code.exe"></label><label>分类 <input id="category-name" maxlength="40" required placeholder="学习"></label><button class="secondary">保存分类</button></form>
+            <p class="hint">分类由你手动设置，不使用提醒白名单推断学习。</p>
+          </details>
+        </section>
+        <section class="review-card"><h3>当天计划</h3><p id="plan-saved"></p>
+          <form id="daily-plan-form"><div id="plan-entries"></div><button class="primary">保存当天计划快照</button></form>
+          <p class="hint">勾选任务并分配分钟。保存替换该日计划，空选保存为空计划；任务估时变化不会改写快照。</p>
+        </section>
+        <section class="review-card"><h3>计划 / 实际对比与任务分布</h3><div id="daily-comparison" class="table-scroll"></div>
+          <details class="reading-note"><summary>查看统计口径与保存规则</summary>
+            <p class="hint">实际为当天有效学习时间，含无计划投入；自由专注单列。时间完成率 = 实际 / 计划，可超过 100%；计划为零时无基准。旧版任务累计不属于当天实际。删除历史会清除实际与复盘，保留计划快照。</p>
+            <p class="hint">历史来自最近检查点，正常保存时最多延迟 30 秒。应用轨道与学习轨道独立，重叠时间不相加。开启全天记录后也展示专注以外的活动；删除历史前请关闭并保存全天记录设置。</p>
+          </details>
+        </section>
+      </div><section class="review-writing review-card"><span class="section-kicker">为明天留一点方向</span><h3>每日复盘</h3>
+        <form id="daily-review-form" class="daily-review">
+          <label>完成了什么<textarea id="review-accomplished" rows="4" maxlength="6000" placeholder="记下一件有进展的事"></textarea></label>
+          <label>遇到什么<textarea id="review-obstacles" rows="4" maxlength="6000" placeholder="哪些地方需要更多时间？"></textarea></label>
+          <label>明天调整<textarea id="review-adjustment" rows="4" maxlength="6000" placeholder="下一步准备怎样安排？"></textarea></label>
+          <button class="primary">保存复盘</button>
+        </form>
+      </section></div>
+    </section>
+
+    <section id="settings-page" class="settings-page" hidden aria-label="应用设置">
+      <div class="settings-intro"><h2>按照你的节奏</h2><p class="muted">专注默认值、声音与本地记录，按需要调整。</p></div>
+      <div class="settings-layout"><nav class="settings-nav" aria-label="设置分组"><a href="#settings-focus">专注默认值</a><a href="#settings-sound">声音引导</a><a href="#settings-privacy">应用与记录</a><a href="#settings-reminders">每日提醒</a><a href="#settings-data">数据管理</a></nav><div class="settings-content">
+        <form id="settings-form">
+          <section id="settings-focus" class="settings-card" tabindex="-1">
+            <div class="settings-heading"><h3>专注设置</h3><label>时长 <input id="duration" type="number" min="1" max="240" value="25" required> 分钟</label></div>
+            <p class="hint">设置默认专注时长。计时模式、番茄参数与空闲阈值在工作台调整，保存时一并记住。</p>
+          </section>
+          <section id="settings-sound" class="settings-card" tabindex="-1"><h3>声音引导</h3>
+          <div class="pomo-sound-card">
+            <label class="activity-opt-in"><input id="pomo-sound-enabled" type="checkbox"> 番茄钟声音引导</label>
+            <p class="hint">离线合成柔和提示音，仅对番茄钟生效。长专注可分别设置事件音色和音量（0—100，0 为静音）；整轮完成优先播放庆祝音，不叠加长休息开始铃声。</p>
+            <div id="pomo-sound-options" hidden>
+              <div id="random-sound-options"><div class="pomo-sound-interval"><label>最小间隔 <input id="pomo-sound-min" type="number" min="1" max="240" value="3" required> 分钟</label><label>最大间隔 <input id="pomo-sound-max" type="number" min="1" max="240" value="5" required> 分钟</label></div>
+              <p class="hint">每次在范围内重新随机；两值相同则固定间隔。暂停、休息时不轻响，继续专注后重新计算间隔。</p>
+              </div><div id="classic-sound-options"><label class="field-label" for="pomo-sound-tone">音色</label><select id="pomo-sound-tone"><option value="soft">柔和</option><option value="bell">清铃</option><option value="wood">木音</option></select>
+              <label class="field-label" for="pomo-sound-volume">音量（0—100，0 为静音）</label><input id="pomo-sound-volume" type="number" min="0" max="100" value="40" required>
+              <div class="pomo-sound-previews"><button id="pomo-preview-cue" type="button" class="secondary">试听轻响</button><button id="pomo-preview-work" type="button" class="secondary">试听庆祝</button><button id="pomo-preview-break" type="button" class="secondary">试听休息结束</button></div>
+              </div>
+              <div id="event-sound-options" hidden></div>
+            </div>
+          </div>
+          </section>
+          <section id="settings-privacy" class="settings-card" tabindex="-1"><h3>应用与活动记录</h3>
+          <label class="field-label" for="whitelist">允许使用的应用</label>
+          <textarea id="whitelist" rows="3" placeholder="每行一个应用名，例如：&#10;Code.exe&#10;msedge.exe"></textarea>
+          <p class="hint">白名单应用不提醒；请填写完整应用名（如 Code.exe），忽略大小写和首尾空格。其他应用每 60 秒最多居中提醒一次，8 秒后关闭。空白名单会提醒所有可识别应用。</p>
+          <label class="activity-opt-in"><input id="record-app-activity" type="checkbox"> 记录专注会话内的应用活动</label>
+          <label class="activity-opt-in"><input id="all-day-activity" type="checkbox"> 全天独立活动记录（无专注及托盘中继续）</label>
+          <p class="hint">两项记录默认关闭，只在本机保存应用名、AFK 与未知状态。全天记录无需开始专注，退出应用后停止。保存设置也会记住学习工作台中选择的计时模式、番茄参数和空闲阈值。</p>
+          </section>
+          <div class="settings-save"><button class="primary" id="save-settings">保存设置</button><span id="settings-status" role="status" aria-live="polite"></span></div>
+        </form>
+      <section id="settings-reminders" class="plan-reminder-settings settings-card" tabindex="-1" aria-labelledby="plan-reminder-heading">
+        <h3 id="plan-reminder-heading">每日计划提醒</h3>
+        <p class="hint">到点提醒今天未完成的计划。关闭到托盘后仍可提醒，专注结束或解锁后再显示；退出应用后停止。</p>
+        <form id="plan-reminder-form">
+          <label class="activity-opt-in"><input id="plan-reminder-enabled" type="checkbox"> 提醒我完成今天的计划</label>
+          <div class="plan-reminder-controls"><label for="plan-reminder-time">每天 <input id="plan-reminder-time" type="time" value="09:00" required> 提醒</label>
+            <button id="plan-reminder-save" type="submit" class="secondary">保存提醒</button>
+          </div>
+          <p id="plan-reminder-save-status" role="status" aria-live="polite"></p>
+        </form>
+        <p id="plan-reminder-status" class="hint" role="status" aria-live="polite">提醒默认关闭。</p>
+        <p class="hint">每天自动提醒一次；可以选择 10 分钟后再提醒或今日忽略。没有待完成计划时不弹窗。</p>
+      </section>
+      <section id="settings-data" class="settings-card danger-zone" tabindex="-1"><h3>数据管理</h3><p class="hint">删除不可撤销，请先核对日期。任务累计用时会保留。</p>
+      <details class="data-management"><summary>删除指定日期历史</summary>    <form id="history-delete-form"><label>删除指定日期的历史 <input id="history-date" type="date" required></label><button class="secondary" id="delete-history" type="submit">删除历史</button><span id="history-status" role="status"></span><p>删除当天计时片段、应用活动和复盘，保留任务累计用时。删除无法撤销，请核对日期。</p></form></details>
+      </section>
+      </div></div>
+    </section>
+    <footer><span class="version">StudyFlow 0.5 · 本地完整版</span><span>任务与学习记录留在本机。</span><details class="reading-note"><summary>后台运行与保存说明</summary><p>关闭窗口后继续在托盘运行。锁屏或休眠会暂停计时，返回后请点击继续。每 30 秒及暂停、结束时保存检查点。重启只恢复已确认历史，未结束会话标为中断，不补算停机时间。</p></details></footer>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

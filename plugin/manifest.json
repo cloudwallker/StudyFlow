@@ -1,0 +1,11 @@
+{
+  "id": "studyflow-phase0",
+  "name": "StudyFlow Phase 0",
+  "version": "0.0.1",
+  "description": "Local Phase 0 API and ten-minute Focus Test. Keep this view open during a test.",
+  "manifestVersion": 1,
+  "minSupVersion": "14.0.0",
+  "iFrame": true,
+  "hooks": [],
+  "permissions": ["getTasks", "addTask", "notify", "showSnack"]
+}
