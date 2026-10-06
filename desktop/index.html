@@ -6,6 +6,7 @@
   <title>StudyFlow</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="workspace.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">跳到学习工作台</a>
   <aside class="sidebar">
     <div class="brand"><span class="brand-mark">S</span><div>StudyFlow<small>计划 · 专注 · 回顾</small></div></div>
     <div class="section-label">我的空间</div>
@@ -19,7 +20,7 @@
     <form id="project-form" class="project-form"><label class="sr-only" for="project-name">新项目名称</label><input id="project-name" maxlength="80" placeholder="新项目名称" required><button title="创建项目" aria-label="创建项目">＋</button></form>
     <div class="sidebar-footer"><span class="status-dot"></span> 本地保存 · 离线可用<small>关闭窗口后，专注继续在托盘运行</small></div>
   </aside>
-  <main>
+  <main id="main-content" tabindex="-1">
     <header><div><div class="eyebrow" id="today">把今天过得更专注</div><h1 id="view-title">学习工作台</h1><p class="muted" id="view-description">安排今天，从一件重要的事开始。</p></div><div class="header-actions"><button id="quick-import" class="secondary" type="button">导入计划</button><button id="quick-add" class="primary" type="button">＋ 添加任务</button></div></header>
     <button id="active-session" class="active-session" type="button" hidden aria-label="返回正在进行的专注"></button>
     <div id="error" role="alert" hidden></div>

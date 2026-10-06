@@ -113,3 +113,7 @@ npm run verify:frontend
 第三方代码保留原有署名及许可：改造的任务剩余时间工具遵循 [Super Productivity 的 MIT 许可](third-party/super-productivity-LICENSE.txt)，改造的 Windows 采集器保留 [ActivityWatch 的 MPL-2.0 许可](third-party/activitywatch-LICENSE.txt)。见[第三方声明](third-party/README.txt)，随包依赖保留各自适用的许可。
 
 仓库目前未为 StudyFlow 自有代码声明根目录许可证；第三方许可不能代替整个项目的许可证。
+
+## 界面体验
+
+离线 Windows 学习计划工具，提供更易操作的日历控件、可见的键盘焦点和直达主工作区的快捷入口。

@@ -113,3 +113,7 @@ Additional Windows checks include `verify:desktop`, `verify:reminder`, `verify:p
 Third-party code retains its original attribution and licenses: the adapted task-time utility is covered by [Super Productivity's MIT license](third-party/super-productivity-LICENSE.txt), and the adapted Windows sampler retains [ActivityWatch's MPL-2.0 license](third-party/activitywatch-LICENSE.txt). See [third-party notices](third-party/README.txt); bundled dependencies keep their applicable licenses.
 
 This repository does not currently declare a root license for StudyFlow's own code. The third-party licenses do not grant a blanket license to the whole project.
+
+## Interface
+
+An offline Windows study planner with larger calendar controls, visible keyboard focus, and a shortcut to the main workspace.

@@ -316,3 +316,78 @@ body.study-view .workspace { grid-template-columns: minmax(0, 1fr) clamp(320px, 
   .settings-save { bottom: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+/* Comfortable planning density, including small windows and large text. */
+:root {
+  --canvas: #f4f8f7;
+  --ink: #153c36;
+  --muted: #475569;
+  --brand: #0f6b60;
+  --brand-hover: #0c574e;
+  --brand-soft: #e6f4f0;
+  --border: #cbded8;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brand);
+  font-weight: 600;
+}
+.skip-link:focus { top: 16px; }
+.brand small, .section-label, .section-kicker { font-size: 12px; letter-spacing: .04em; }
+.nav-item, .project-link { min-height: 44px; font-size: 14px; }
+main > header p, .agenda-summary, .task-list p, .task-meta, .task-notes, .muted,
+.hint, .import-panel .hint, .json-guidance, .agenda-empty, .empty p { font-size: 14px; line-height: 1.7; }
+.task-list strong, .task-heading { font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.overview small, .calendar-jump, .calendar-weekdays { font-size: 13px; color: var(--muted); }
+.overview { border-color: var(--border); background: #fff; }
+.overview > div { min-width: 0; }
+.calendar-day { min-height: 52px; line-height: 1.4; }
+.calendar-day small { font-size: 12px; }
+.calendar-day.today { outline: 2px solid var(--brand); outline-offset: -2px; }
+.calendar-day.selected { background: var(--brand); }
+.task-row { align-items: flex-start; padding-block: 18px; }
+.task-actions { gap: 8px; }
+.task-actions button, .agenda-tabs button, .secondary, .primary, .calendar-toolbar button,
+.project-form button, .panel-title button, .toolbar button { min-height: 44px; font-size: 14px; }
+.task-actions button { white-space: normal; }
+input:not([type=checkbox]):not([type=range]), select { min-height: 44px; }
+.focus-panel, .tasks-panel, .settings-card, .review-card { border-color: var(--border); }
+.focus-panel { background: #fafffd; }
+.timer-label, .timer-detail, .focus-panel .hint { color: var(--muted); font-size: 13px; }
+.task-entry > summary { min-height: 44px; padding-block: 10px; font-size: 15px; }
+.event-sound-row strong { font-size: 14px; }
+:is(button, a, input, select, textarea, summary):focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+@media (max-width: 850px) {
+  .panel-title, main > header, .calendar-toolbar, .calendar-jump { flex-wrap: wrap; gap: 12px; }
+  .task-actions { flex-direction: row; flex-wrap: wrap; }
+}
+@media (max-width: 640px) {
+  .brand small { font-size: 12px; }
+  .nav-item { min-height: 44px; font-size: 14px; padding: 10px; }
+  .sidebar { min-height: auto; }
+  main { padding: 22px 16px; }
+  .tasks-panel, .focus-panel, .settings-card, .review-card { padding: 16px; }
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .focus-panel { display: block; }
+  .overview { flex-wrap: wrap; gap: 16px; }
+  .task-row { flex-wrap: wrap; gap: 12px; }
+  .task-actions { width: 100%; justify-content: flex-end; padding-top: 0; }
+  .task-actions button { flex: 1 1 auto; }
+  .agenda-tabs { flex-wrap: wrap; gap: 8px; }
+  .calendar-grid { gap: 2px; }
+  .calendar-day { min-width: 0; min-height: 48px; padding: 6px 2px; font-size: 14px; }
+  .calendar-day small { font-size: 11px; }
+  input:not([type=checkbox]):not([type=range]), select, textarea { font-size: 16px; }
+  .project-form input { min-width: 0; }
+  .import-panel .hint { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
